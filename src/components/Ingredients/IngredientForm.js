@@ -4,10 +4,11 @@ import Card from "../UI/Card";
 import "./IngredientForm.css";
 
 const IngredientForm = React.memo((props) => {
-  const [inputState, setInputState] = useState({ title: "", amount: "" });
+  const [title, setTitle] = useState("");
+  const [amount, setAmount] = useState("");
   const submitHandler = (event) => {
     event.preventDefault();
-    console.log(inputState.title, inputState.amount);
+    console.log(title, amount);
     // ...
   };
 
@@ -20,13 +21,9 @@ const IngredientForm = React.memo((props) => {
             <input
               type="text"
               id="title"
-              value={inputState.title}
+              value={title}
               onChange={(event) => {
-                const newTitle = event.target.value;
-                setInputState((prevstate) => ({
-                  title: newTitle,
-                  amount: prevstate.amount,
-                }));
+                setTitle(event.target.value);
               }}
             />
           </div>
@@ -35,13 +32,9 @@ const IngredientForm = React.memo((props) => {
             <input
               type="number"
               id="amount"
-              value={inputState.amount}
+              value={amount}
               onChange={(event) => {
-                const newAmount = event.target.value;
-                setInputState((prevState) => ({
-                  title: prevState.title,
-                  amount: newAmount,
-                }));
+                setAmount(event.target.value);
               }}
             />
           </div>
