@@ -13,13 +13,23 @@ function Ingredients() {
       { id: Math.random().toString(), ...ingredient },
     ]);
   };
+
+  const onRemoveIngredient = (id) => {
+    console.log(ingredients);
+    setIngredients((prevIngredients) =>
+      prevIngredients.filter((ingredient) => ingredient.id !== id)
+    );
+  };
   return (
     <div className="App">
       <IngredientForm onAddIngredient={onAddIngredientHandler} />
 
       <section>
         <Search />
-        <IngredientList ingredients={ingredients} onRemoveItem={() => {}} />
+        <IngredientList
+          ingredients={ingredients}
+          onRemoveItem={onRemoveIngredient}
+        />
       </section>
     </div>
   );
