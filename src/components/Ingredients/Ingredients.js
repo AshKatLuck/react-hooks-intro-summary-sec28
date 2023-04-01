@@ -7,9 +7,9 @@ import Search from "./Search";
 function Ingredients() {
   const [ingredients, setIngredients] = useState([]);
 
-  useEffect(() => {
-    console.log("rendering");
-  }, [ingredients]);
+  // useEffect(() => {
+  //   console.log("rendering");
+  // }, [ingredients]);
 
   useEffect(() => {
     fetch(
@@ -52,18 +52,23 @@ function Ingredients() {
   };
 
   const onRemoveIngredient = (id) => {
-    console.log(ingredients);
-    setIngredients((prevIngredients) =>
-      prevIngredients.filter((ingredient) => ingredient.id !== id)
-    );
+    console.log(id);
+    fetch(
+      `https://react-hooks-demo-91469-default-rtdb.firebaseio.com/ingredient/${id}.json`,
+      {
+        method: "DELETE",
+      }
+    ).then((response) => {
+      console.log(response);
+      setIngredients((prevIngredients) =>
+        prevIngredients.filter((ingredient) => ingredient.id !== id)
+      );
+    });
   };
 
-  const onLoadFilteredIngredients = useCallback(
-    (filteredIngredients) => {
-      setIngredients(filteredIngredients);
-    },
-    [setIngredients]
-  );
+  const onLoadFilteredIngredients = useCallback((filteredIngredients) => {
+    setIngredients(filteredIngredients);
+  }, []);
   return (
     <div className="App">
       <IngredientForm onAddIngredient={onAddIngredientHandler} />
