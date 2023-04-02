@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useReducer } from "react";
+import React, { useCallback, useReducer } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
@@ -34,36 +34,14 @@ const httpReducer = (currentHttpState, action) => {
 };
 
 function Ingredients() {
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [error, setError] = useState();
   const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
   const [httpState, dispatchHttp] = useReducer(httpReducer, {
     isLoading: false,
     error: null,
   });
 
-  useEffect(() => {
-    fetch(
-      "https://react-hooks-demo-91469-default-rtdb.firebaseio.com/ingredient.json"
-    )
-      .then((response) => response.json())
-      .then((responseData) => {
-        const loadedIngredients = [];
-        for (const key in responseData) {
-          loadedIngredients.push({
-            id: responseData[key].name,
-            title: responseData[key].title,
-            amount: responseData[key].amount,
-          });
-          dispatch({ type: "SET", ingredients: loadedIngredients });
-          // setIngredients(loadedIngredients);
-        }
-      });
-  }, []);
-
   const onAddIngredientHandler = (ingredient) => {
     dispatchHttp({ type: "SEND" });
-    // setIsLoading(true);
     setTimeout(() => {
       fetch(
         "https://react-hooks-demo-91469-default-rtdb.firebaseio.com/ingredient.json",
@@ -77,7 +55,6 @@ function Ingredients() {
       )
         .then((response) => {
           dispatchHttp({ type: "RESPONSE" });
-          // setIsLoading(false);
           return response.json();
         })
         .then((responseData) => {
@@ -85,17 +62,11 @@ function Ingredients() {
             type: "ADD",
             ingredient: { id: responseData.name, ...ingredient },
           });
-          // setIngredients((prevIngredients) => [
-          //   ...prevIngredients,
-          //   { id: responseData.name, ...ingredient },
-          // ]);
         });
-      // setIsLoading(false);
     }, 1500);
   };
 
   const onRemoveIngredient = (id) => {
-    // setIsLoading(true);
     dispatchHttp({ type: "SEND" });
     fetch(
       `https://react-hooks-demo-91469-default-rtdb.firebaseio.com/ingredient/${id}.json`,
@@ -104,13 +75,8 @@ function Ingredients() {
       }
     )
       .then((response) => {
-        // console.log(response);
-        // setIsLoading(false);
         dispatchHttp({ type: "RESPONSE" });
         dispatch({ type: "DELETE", id: id });
-        // setIngredients((prevIngredients) =>
-        //   prevIngredients.filter((ingredient) => ingredient.id !== id)
-        // );
       })
       .catch((error) => {
         dispatchHttp({ type: "ERROR", errorMessage: error.message });
@@ -119,11 +85,9 @@ function Ingredients() {
 
   const onLoadFilteredIngredients = useCallback((filteredIngredients) => {
     dispatch({ type: "SET", ingredients: filteredIngredients });
-    // setIngredients(filteredIngredients);
   }, []);
 
   const clearErrorModal = () => {
-    // setError(null);
     dispatchHttp({ type: "CLEAR" });
   };
   return (
