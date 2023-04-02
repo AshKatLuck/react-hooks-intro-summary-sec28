@@ -1,4 +1,4 @@
-import React, { usestate } from "react";
+import React, { useState } from "react";
 
 export const AuthContext = React.createContext({
   isAuth: false,
@@ -6,7 +6,7 @@ export const AuthContext = React.createContext({
 });
 
 const AuthContextProvider = (props) => {
-  const [isAuthenticated, setIsAuthenticated] = usestate(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const loginHandler = () => {
     setIsAuthenticated(true);
@@ -20,3 +20,5 @@ const AuthContextProvider = (props) => {
     </AuthContext.Provider>
   );
 };
+
+export default AuthContextProvider;
