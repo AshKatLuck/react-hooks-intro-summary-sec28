@@ -1,18 +1,27 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useReducer } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
 import Search from "./Search";
 import ErrorModal from "../UI/ErrorModal";
 
+const ingredientReducer = (currentIngredients, action) => {
+  switch (action.type) {
+    case "SET":
+      return action.ingredients;
+    case "ADD":
+      return [...currentIngredients, action.ingredient];
+    case "DELETE":
+      return currentIngredients.filter((ig) => ig.id !== action.id);
+    default:
+      throw new Error("Should not get here");
+  }
+};
+
 function Ingredients() {
-  const [ingredients, setIngredients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
-
-  // useEffect(() => {
-  //   console.log("rendering");
-  // }, [ingredients]);
+  const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
 
   useEffect(() => {
     fetch(
@@ -27,7 +36,8 @@ function Ingredients() {
             title: responseData[key].title,
             amount: responseData[key].amount,
           });
-          setIngredients(loadedIngredients);
+          dispatch({ type: "SET", ingredients: loadedIngredients });
+          // setIngredients(loadedIngredients);
         }
       });
   }, []);
@@ -46,13 +56,18 @@ function Ingredients() {
         }
       )
         .then((response) => {
+          setIsLoading(false);
           return response.json();
         })
         .then((responseData) => {
-          setIngredients((prevIngredients) => [
-            ...prevIngredients,
-            { id: responseData.name, ...ingredient },
-          ]);
+          dispatch({
+            type: "ADD",
+            ingredient: { id: responseData.name, ...ingredient },
+          });
+          // setIngredients((prevIngredients) => [
+          //   ...prevIngredients,
+          //   { id: responseData.name, ...ingredient },
+          // ]);
         });
       setIsLoading(false);
     }, 1500);
@@ -67,20 +82,22 @@ function Ingredients() {
       }
     )
       .then((response) => {
-        console.log(response);
-        setIngredients((prevIngredients) =>
-          prevIngredients.filter((ingredient) => ingredient.id !== id)
-        );
+        // console.log(response);
+        setIsLoading(false);
+        dispatch({ type: "DELETE", id: id });
+        // setIngredients((prevIngredients) =>
+        //   prevIngredients.filter((ingredient) => ingredient.id !== id)
+        // );
       })
       .catch((error) => {
         setError(error.message);
         setIsLoading(false);
       });
-    setIsLoading(false);
   };
 
   const onLoadFilteredIngredients = useCallback((filteredIngredients) => {
-    setIngredients(filteredIngredients);
+    dispatch({ type: "SET", ingredients: filteredIngredients });
+    // setIngredients(filteredIngredients);
   }, []);
 
   const clearErrorModal = () => {
@@ -96,8 +113,9 @@ function Ingredients() {
 
       <section>
         <Search onLoadIngredients={onLoadFilteredIngredients} />
+        {console.log(userIngredients)}
         <IngredientList
-          ingredients={ingredients}
+          ingredients={userIngredients}
           onRemoveItem={onRemoveIngredient}
         />
       </section>
