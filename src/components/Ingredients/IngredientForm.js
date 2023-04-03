@@ -11,7 +11,7 @@ const IngredientForm = React.memo((props) => {
     event.preventDefault();
     props.onAddIngredient({ title: title, amount: amount });
   };
-
+  console.log("RENDERING THE FORM from IngredientForm.js");
   return (
     <section className="ingredient-form">
       <Card>

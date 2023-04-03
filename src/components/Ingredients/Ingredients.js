@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer } from "react";
+import React, { useCallback, useMemo, useReducer } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
@@ -40,7 +40,7 @@ function Ingredients() {
     error: null,
   });
 
-  const onAddIngredientHandler = (ingredient) => {
+  const onAddIngredientHandler = useCallback((ingredient) => {
     dispatchHttp({ type: "SEND" });
     setTimeout(() => {
       fetch(
@@ -64,9 +64,9 @@ function Ingredients() {
           });
         });
     }, 1500);
-  };
+  }, []);
 
-  const onRemoveIngredient = (id) => {
+  const onRemoveIngredient = useCallback((id) => {
     dispatchHttp({ type: "SEND" });
     fetch(
       `https://react-hooks-demo-91469-default-rtdb.firebaseio.com/ingredient/${id}.json`,
@@ -81,15 +81,24 @@ function Ingredients() {
       .catch((error) => {
         dispatchHttp({ type: "ERROR", errorMessage: error.message });
       });
-  };
+  }, []);
 
   const onLoadFilteredIngredients = useCallback((filteredIngredients) => {
     dispatch({ type: "SET", ingredients: filteredIngredients });
   }, []);
 
-  const clearErrorModal = () => {
+  const clearErrorModal = useCallback(() => {
     dispatchHttp({ type: "CLEAR" });
-  };
+  }, []);
+
+  const ingredientList = useMemo(() => {
+    return (
+      <IngredientList
+        ingredients={userIngredients}
+        onRemoveItem={onRemoveIngredient}
+      />
+    );
+  }, [userIngredients, onRemoveIngredient]);
   return (
     <div className="App">
       {httpState.error && (
@@ -102,11 +111,7 @@ function Ingredients() {
 
       <section>
         <Search onLoadIngredients={onLoadFilteredIngredients} />
-        {console.log(userIngredients)}
-        <IngredientList
-          ingredients={userIngredients}
-          onRemoveItem={onRemoveIngredient}
-        />
+        {ingredientList}
       </section>
     </div>
   );

@@ -28,7 +28,7 @@ const Search = React.memo((props) => {
                 amount: responseData[key].amount,
               });
               //logic
-              console.log("inside the useEffect in search", loadedIngredients);
+
               onLoadIngredients(loadedIngredients);
             }
           });
