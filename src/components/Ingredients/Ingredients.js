@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useReducer } from "react";
+import React, { useCallback, useEffect, useMemo, useReducer } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
@@ -21,54 +21,43 @@ const ingredientReducer = (currentIngredients, action) => {
 
 function Ingredients() {
   const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
-  const { isLoading, data, error, sendRequest } = useHttp();
+  const { isLoading, data, error, sendRequest, reqextra, reqidentifier } =
+    useHttp();
 
-  const onAddIngredientHandler = useCallback((ingredient) => {
-    // dispatchHttp({ type: "SEND" });
-    // setTimeout(() => {
-    //     fetch(
-    //       "https://react-hooks-demo-91469-default-rtdb.firebaseio.com/ingredient.json",
-    //       {
-    //         method: "POST",
-    //         body: JSON.stringify(ingredient),
-    //         headers: {
-    //           "Content-Type": "application/json",
-    //         },
-    //       }
-    //     )
-    //       .then((response) => {
-    //         dispatchHttp({ type: "RESPONSE" });
-    //         return response.json();
-    //       })
-    //       .then((responseData) => {
-    //         dispatch({
-    //           type: "ADD",
-    //           ingredient: { id: responseData.name, ...ingredient },
-    //         });
-    //       });
-    //   }, 1500);
-  }, []);
+  useEffect(() => {
+    if (!isLoading && !error && reqidentifier === "DELETE_INGREDIENT") {
+      dispatch({ type: "DELETE", id: reqextra });
+    } else if (!isLoading && !error && reqidentifier === "ADD_INGREDIENT") {
+      dispatch({
+        type: "ADD",
+        ingredient: { id: data.name, ...reqextra },
+      });
+    }
+  }, [data, reqextra, reqidentifier, error, isLoading]);
+
+  const onAddIngredientHandler = useCallback(
+    (ingredient) => {
+      // console.log(ingredient);
+      sendRequest(
+        "https://react-hooks-demo-91469-default-rtdb.firebaseio.com/ingredient.json",
+        "POST",
+        JSON.stringify(ingredient),
+        ingredient,
+        "ADD_INGREDIENT"
+      );
+    },
+    [sendRequest]
+  );
 
   const onRemoveIngredient = useCallback(
     (id) => {
       sendRequest(
         `https://react-hooks-demo-91469-default-rtdb.firebaseio.com/ingredient/${id}.json`,
-        "DELETE"
+        "DELETE",
+        null,
+        id,
+        "DELETE_INGREDIENT"
       );
-      // dispatchHttp({ type: "SEND" });
-      // fetch(
-      //   `https://react-hooks-demo-91469-default-rtdb.firebaseio.com/ingredient/${id}.json`,
-      //   {
-      //     method: "DELETE",
-      //   }
-      // )
-      //   .then((response) => {
-      //     dispatchHttp({ type: "RESPONSE" });
-      //     dispatch({ type: "DELETE", id: id });
-      //   })
-      //   .catch((error) => {
-      //     dispatchHttp({ type: "ERROR", errorMessage: error.message });
-      //   });
     },
     [sendRequest]
   );
